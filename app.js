@@ -1,10 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
 
+app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 
 
@@ -22,7 +20,7 @@ app.get('/events', (req,res) =>{
 	//for i =0 to size (events)
 	//	show "Event " + i + ": " + events[i].title;
 	output="<ul>";
-	for (var i in events) {    // don't actually do this
+	for (let i in events) {    // don't actually do this
   		output += '<li><a href="/events/'+i+'">Event ' + i+ ': ' + events[i].title +'</a></li>\n';
 	}
 	output+="</ul>";
@@ -30,17 +28,43 @@ app.get('/events', (req,res) =>{
 });
 
 app.get('/events/:id', (req, res) => {
-  res.send("The event title for event "+req.params.id+" is the " + events[req.params.id].title)
+  res.send("The event title for event " + req.params.id + " is the " + events[req.params.id].title)
 });
 
 app.post('/events', (req, res) => {
-	console.log(req.body.title);
-	//console.log('This would create a new object with title ' + req.body.title + ', definition ' + req.body.description + ' and date ' +req.body.date);
-  res.send('')
+	
+	
+	
+	let lastId = 0;
+
+	for (let i in events) {    // don't actually do this
+  		
+		if (lastId<events[i].id){
+			lastId = parseInt(events[i].id);
+		}
+
+	}
+
+	let newEvent = {
+		id : ++lastId,
+		title : req.body.title,
+		description : req.body.description,
+		date : req.body.date
+	}
+
+	events.push(newEvent);
+
+	console.log(
+		'This would create a new object with title ' + 	newEvent.title + 
+		', description ' +newEvent.description + 
+		' and date ' + newEvent.date+
+		' and it got the id of ' + newEvent.id);
+  
+  res.send('');
 })
 
 
-//event definition
+//event title
 let event1 = {
 	id: 1, 
   title:"Tom",
