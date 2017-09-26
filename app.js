@@ -11,7 +11,7 @@ app.listen(3000, function() {
 });
 
 app.post('/', function(req, res) {
-    res.send('Got a POST request')
+    res.json('Got a POST request')
 });
 
 //Event endpoints
@@ -24,22 +24,28 @@ app.get('/events', (req, res) => {
         output += '<li><a href="/events/' + i + '">Event ' + i + ': ' + events[i].title + '</a></li>\n';
     }
     output += "</ul>";
-    res.send(events);
+    res.json(events);
 });
 
 app.get('/events/:id', (req, res) => {
-    res.send(events[req.params.id])
+    let id = req.params.id;
+    let event = events.filter((item)=> { return item.id == id;})
+    event=event[0];
+    res.json(event)
+
 });
 
 app.delete('/events/:id', (req, res) => {
     let { id } = req.params;
-    let event = events[id];
-
-    if (event) {events.splice(id - 1, 1)
+   
+    let event = events.filter((item)=> { return item.id == id;})
+    event=event[0];
+    if (event) {
+        events.splice(events.indexOf(event), 1);
+        console.log('delted item ' + event.id);
     }
-
-    res.send(events[req.params.id])
-
+    res.send('');
+   
 });
 
 app.post('/events', (req, res) => {
@@ -73,32 +79,33 @@ app.post('/events', (req, res) => {
         ' and date ' + newEvent.date +
         ' and it got the id of ' + newEvent.id);
 
-    res.send(newEvent);
+    res.json(newEvent);
 })
 
 app.patch('/events/:id', (req, res) => {
     // res.send("" + req.params.id + "" + events[req.params.id].title)
     let { id } = req.params;
-    let event = events[id];
-
+    let event = events.filter((item)=> { return item.id == id;})
+    event=event[0];
     if (event) {
         event.title = req.body.title;
         event.date = req.body.date;
         event.description = req.body.description;
     }
 
+
     res.json(event);
 });
 
 //event title
 let event1 = {
-    id: 1,
+    id: 0,
     title: "Tom",
     description: "Hanks",
     date: "9-22-2017"
 };
 let event2 = {
-    id: 2,
+    id: 1,
     title: "Tod",
     description: "sHanks",
     date: "9-22-2017"
