@@ -1,3 +1,4 @@
+//Load express modules
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -7,6 +8,43 @@ app.use(bodyParser.json());
 
 module.exports = app
 
+
+//Load mongoose modules
+var mongoose =  require('mongoose');
+var Schema = mongoose.Schema;
+let collection="our_collection";
+
+
+//Connect to the mongo DB
+mongoose.connect('mongodb://localhost/microverse',{
+  useMongoClient: true,
+  /* other options */
+});
+
+var db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log("We're succesfully connected!")
+});
+
+
+//define the schema and model
+
+var eventSchema = new Schema(
+    {
+        title: String,
+        description: String,
+        date: { type: Date, default: Date.now}
+
+    }
+);
+
+var event = mongoose.model('event', eventSchema);
+
+
+
+// Start the Http server
 app.listen(3000, function() {
     console.log('Example app listening on :3000')
 });
@@ -17,22 +55,44 @@ app.post('/', function(req, res) {
 
 //Event endpoints
 app.get('/events', (req, res) => {
-    let output = "";
-    //for i =0 to size (events)
-    //	show "Event " + i + ": " + events[i].title;
-    output = "<ul>";
-    for (let i in events) { // don't actually do this
-        output += '<li><a href="/events/' + i + '">Event ' + i + ': ' + events[i].title + '</a></li>\n';
+   event.find(  
+    {},  // query
+    //{"name": true, "owner": true},  // Only return an object with the "name" and "owner" fields. "_id" is included by default, so you'll need to remove it if you don't want it.
+    (err, events) => {
+        if (err) {
+            res.send(err)
+        }
+         if (events) {  // Search could come back empty, so we should protect against sending nothing back
+            res.json(events);
+        } else {  // In case no kitten was found with the given query
+            res.send("No events found")
+        }
     }
-    output += "</ul>";
-    res.json(events);
+);
+    
 });
 
 app.get('/events/:id', (req, res) => {
     let id = req.params.id;
-    let event = events.filter((item)=> { return item.id == id;})
-    event=event[0];
-    res.json(event)
+    
+    event.findById(id, (err, event) => {  
+    
+        if (err) {
+            res.status(500).send(err)
+        }
+        else {
+        
+            if (event) {
+                res.json(event);
+            
+            } 
+            else {
+                
+                res.status(404).send("No event found with that ID")
+            
+            }
+        }
+    });
 
 });
 
@@ -62,25 +122,16 @@ app.post('/events', (req, res) => {
 
     }
 
-    let newEvent = {
-        id: ++lastId,
+    var newEvent = new event({
         title: req.body.title,
         description: req.body.description,
         date: req.body.date
-    }
-
-    //It should validate that an existing event ID is passed as parameter
-    //It should return the modified event
-
-    events.push(newEvent);
-
-    console.log(
-        'This would create a new object with title ' + newEvent.title +
-        ', description ' + newEvent.description +
-        ' and date ' + newEvent.date +
-        ' and it got the id of ' + newEvent.id);
-
+    });
+    
+    newEvent.save();
+        
     res.json(newEvent);
+      
 })
 
 app.patch('/events/:id', (req, res) => {
@@ -98,18 +149,3 @@ app.patch('/events/:id', (req, res) => {
     res.json(event);
 });
 
-//event title
-let event1 = {
-    id: 0,
-    title: "Tom",
-    description: "Hanks",
-    date: "9-22-2017"
-};
-let event2 = {
-    id: 1,
-    title: "Tod",
-    description: "sHanks",
-    date: "9-22-2017"
-};
-
-let events = [event1, event2];
