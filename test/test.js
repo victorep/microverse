@@ -49,11 +49,8 @@ it('Get the created event', function(done) { // <= Pass in done callback
   .end(function(err, res) {
     expect(res).to.have.status(200);
     expect(res.body._id).to.equal(newEventId); // Recommended
-    expect(res.body).to.include(event)
-                                  
-    console.log(res.body);
+    expect(res.body).to.include(event)            
     newEvent = res.body;
-    console.log(newEvent); 
     done();     // <= Call done to signal callback end
   });
 });
@@ -64,7 +61,6 @@ it('Search for new event using title', function(done) { // <= Pass in done callb
   .end(function(err, res) {
     expect(res).to.have.status(200);
     expect(res.body).to.deep.include(newEvent)
-    //expect(res.body).to.be.an('array').that.includes(newEvent);
     done();                               // <= Call done to signal callback end
   });
 });
@@ -99,7 +95,7 @@ it('Update the new event', function(done) { // <= Pass in done callback
   chai.request(app)
   
   .delete('/events/' + newEventId)
-  //.set('content-type', 'application/x-www-form-urlencoded')
+  .set('content-type', 'application/x-www-form-urlencoded')
   .send(event)
   .end(function(err, res) {
     expect(res).to.have.status(200);

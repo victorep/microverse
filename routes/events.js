@@ -5,10 +5,9 @@ const event = require('../models/event')
 
 router.get('/search', (req, res) => {
 	let searchTitle = req.query.title;
-	var regex = new RegExp(searchTitle, "i")
-    , query = { title: regex };
-    console.log(query);
-   event.find(query,  // query
+	var regex = new RegExp(searchTitle, "i"), query = { title: regex };
+   event.find(
+    query,  // query
     //{"name": true, "owner": true},  // Only return an object with the "name" and "owner" fields. "_id" is included by default, so you'll need to remove it if you don't want it.
     (err, events) => {
         if (err) {
@@ -81,7 +80,7 @@ router.patch('/:id', (req, res) => {
                 event.description = req.body.description;
                 event.date = req.body.date;
                 event.save()
-                console.log(req.body)
+                //console.log(req.body)
                 res.json(event);
 
             } 
@@ -107,7 +106,7 @@ router.delete('/:id', (req, res) => {
 
             if (event) {
                 event.remove()
-                console.log(req.body)
+                //console.log(req.body)
                 res.send('');
 
             } 

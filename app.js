@@ -8,11 +8,11 @@ const events = require('./routes/events');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-module.exports = app
-
 // Start the Http server
 app.listen(3000, function() {
-    console.log('Example app listening on :3000')
+    console.log('App listening on port 3000')
 });
 
 app.use('/events', events)
+
+module.exports = app
