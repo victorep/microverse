@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const event = require('../models/event')
+const event = require('../models/Event')
 
 router.get('/search', (req, res) => {
 	let searchTitle = req.query.title;
